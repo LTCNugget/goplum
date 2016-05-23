@@ -25,12 +25,13 @@ chrome.runtime.onMessage.addListener(function(message) {
     songData.title = parsed.title;
     songData.album = parsed.album;
     songData.artist = parsed.artist;
+    songData.art = parsed.url;
   }
 }
 chrome.webRequest.onCompleted.addListener(function(request) {
   if (debug) console.log("A request matching the filter was completed");
   chrome.tabs.executeScript({
-    code: 'var songInfo = { }; songInfo.title = $("#currently-playing-title").innerText; songInfo.album = $(".player-album").innerText; songInfo.artist = $(".player-artist").innerText; chrome.runtime.sendMessage({greeting:"infojson", text:JSON.stringify(songInfo)});'
+    code: 'var songInfo = { }; songInfo.title = $("#currently-playing-title").innerText; songInfo.album = $(".player-album").innerText; songInfo.artist = $(".player-artist").innerText; songInfo.art = $("#playerBarArt").src; chrome.runtime.sendMessage({greeting:"infojson", text:JSON.stringify(songInfo)});'
   });
   songdata.urls = JSON.parse(httpGet(request.url).replace("\u003d", "=").replace("\u0026", "&")).urls;
   httpPost("//24.125.232.31/scripts/goplum.php", JSON.stringify(songData));

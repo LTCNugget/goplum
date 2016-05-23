@@ -1,21 +1,16 @@
 {
   "manifest_version": 2,
-  "name": "goplum",
-  "description": "This extension will take the info and music file of a music.google.com page",
-  "version": "0.1",
+  "name": "Goplum",
+  "description": "A Google Chrome extension that takes playing music from Google Play Music and puts it on a server.",
+  "version": "0.5",
   "minimum_chrome_version": "10.0",
-  "devtools_page": "../html/devOpen.html",
   "icons": {
     "48": "img/icon48.png"
   },
-  "content_scripts": [ {
-    "js": ["js/jQuery.js", "js/content.js"],
-    "matches": ["<all_urls>"]
-  } ],
   "background": {
     "scripts": ["js/background.js"]
   },
   "permissions": [
-    "activeTab", "tabs"
+    "activeTab", "webRequest", "*://*.pandora.com/", "*://24.125.232.31/"
   ]
 }
