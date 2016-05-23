@@ -1,0 +1,1 @@
+chrome.devtools.panels.create("goplum", "../img/icon48.png", "../html/devPage.html", function(panel) {});
