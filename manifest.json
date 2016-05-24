@@ -11,7 +11,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://play.google.com/listen?*"],
+      "matches": ["https://play.google.com/music/listen?*"],
       "js": ["js/jQuery.min.js"]
     }
   ],
