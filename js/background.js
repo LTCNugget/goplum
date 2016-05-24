@@ -33,6 +33,8 @@ chrome.webRequest.onCompleted.addListener(function(request) {
   chrome.tabs.executeScript({
     code: 'var songInfo = { }; songInfo.title = $("#currently-playing-title").innerText; songInfo.album = $(".player-album").innerText; songInfo.artist = $(".player-artist").innerText; songInfo.art = $("#playerBarArt").src; console.log(songInfo); chrome.runtime.sendMessage({greeting:"infojson", text:JSON.stringify(songInfo)});'
   });
-  songdata.urls = JSON.parse(httpGet(request.url).replace("\u003d", "=").replace("\u0026", "&")).urls;
-  if (songData.artist) httpPost("//24.125.232.31/scripts/goplum.php", JSON.stringify(songData));
-}, {urls:["https://play.google.com/music/mplay*","https://play.google.com/music/wplay*"]});
+  songData.urls = JSON.parse(httpGet(request.url).replace("\u003d", "=").replace("\u0026", "&")).urls;
+  setTimeout(function() {
+    if (songData.artist) httpPost("//24.125.232.31/scripts/goplum.php", JSON.stringify(songData));
+  }, 2000);
+}, {urls:["https://play.google.com/music/mplay?*"/*,"https://play.google.com/music/wplay?*"*/]});

@@ -9,6 +9,12 @@
     "32": "img/icon32.png",
     "96": "img/icon96.png"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://play.google.com/listen?*"],
+      "js": ["js/jQuery.min.js"]
+    }
+  ],
   "background": {
     "scripts": ["js/background.js"]
   },
