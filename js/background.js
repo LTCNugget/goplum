@@ -31,12 +31,14 @@ chrome.runtime.onMessage.addListener(function(message) {
 chrome.webRequest.onCompleted.addListener(function(request) {
   if (debug) console.log("A request matching the filter was completed");
   setTimeout(function() {
+    if (debug) console.log("The timeout() for .executeScript has ended");
     chrome.tabs.executeScript({
       code: 'var songInfo = { }; songInfo.title = $("#currently-playing-title").innerText; songInfo.album = $(".player-album").innerText; songInfo.artist = $(".player-artist").innerText; songInfo.art = $("#playerBarArt").src; console.log(songInfo); chrome.runtime.sendMessage({greeting:"infojson", text:JSON.stringify(songInfo)});'
     });
   }, 2000);
   songData.urls = JSON.parse(httpGet(request.url + "&goplum=true").replace("\u003d", "=").replace("\u0026", "&")).urls;
   setTimeout(function() {
+    if (debug) console.log("The timeout() for httpPost() has ended");
     if (songData.info.artist) httpPost("//24.125.232.31/scripts/goplum.php", JSON.stringify(songData));
   }, 2000);
 }, {urls:["https://play.google.com/music/mplay?*&start=0","https://play.google.com/music/wplay?*&start=0"]});
