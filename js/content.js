@@ -1,2 +1,0 @@
-var songInfo = { }; songInfo.title = $("#currently-playing-title").innerText; songInfo.album = $(".player-album").innerText; songInfo.artist = $(".player-artist").innerText; chrome.runtime.sendMessage({greeting:"infojson", text:JSON.stringify(songInfo)});
-// $("#player-bar-forward").click(); break;
