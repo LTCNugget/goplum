@@ -33,8 +33,8 @@ chrome.webRequest.onCompleted.addListener(function(request) {
   setTimeout(function() {
     if (debug) console.log("The timeout() for .executeScript has ended");
     chrome.tabs.executeScript({
-      code: 'var songInfo = { }; songInfo.title = $("#currently-playing-title").innerText; songInfo.album = $(".player-album").innerText; songInfo.artist = $(".player-artist").innerText; songInfo.art = $("#playerBarArt").src; console.log(songInfo); chrome.runtime.sendMessage({greeting:"infojson", text:JSON.stringify(songInfo)});'
-    });
+      code: 'var songInfo = { title:$("#currently-playing-title").innerText, album:$(".player-album").innerText, artist:$(".player-artist").innerText, $("#playerBarArt").src }; console.log(songInfo); chrome.runtime.sendMessage({greeting:"infojson", text:JSON.stringify(songInfo)});'
+    });
   }, 2000);
   songData.urls = JSON.parse(httpGet(request.url + "&goplum=true").replace("\u003d", "=").replace("\u0026", "&")).urls;
   setTimeout(function() {
