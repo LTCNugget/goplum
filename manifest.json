@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Goplum",
   "description": "A Google Chrome extension that takes playing music from Google Play Music and puts it on a server.",
-  "version": "0.7",
+  "version": "0.9",
   "minimum_chrome_version": "10.0",
   "icons": {
     "16": "img/icon16.png",
