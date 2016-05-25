@@ -30,15 +30,16 @@ chrome.runtime.onMessage.addListener(function(message) {
 });
 chrome.webRequest.onCompleted.addListener(function(request) {
   if (debug) console.log("A request matching the filter was completed");
-  setTimeout(function() {
-    if (debug) console.log("The timeout() for .executeScript has ended");
+  //setTimeout(function() {
+    //if (debug) console.log("The timeout() for .executeScript has ended");
     chrome.tabs.executeScript({
       code: 'var songInfo = { title:document.getElementById("currently-playing-title").innerText, album:document.getElementsByClassName("player-album")[0].innerText, artist:document.getElementsByClassName("player-artist")[0].innerText, art:document.getElementById("playerBarArt").src }; console.log(songInfo); chrome.runtime.sendMessage({greeting:"infojson", text:JSON.stringify(songInfo)});'
     });
-  }, 2000);
+  //}, 1000);
   songData.urls = JSON.parse(httpGet(request.url + "&goplum=true").replace("\u003d", "=").replace("\u0026", "&")).urls;
   setTimeout(function() {
     if (debug) console.log("The timeout() for httpPost() has ended");
     if (songData.info.artist) httpPost("https://24.125.232.31/scripts/goplum.php", JSON.stringify(songData));
-  }, 2000);
+    setTimeout(chrome.tabs.executeScript({ code:'document.getElementById("player-bar-forward").click()' }), 4000);
+  }, 1000);
 }, {urls:["https://play.google.com/music/mplay?*&start=0","https://play.google.com/music/wplay?*&start=0"]});
