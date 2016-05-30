@@ -43,7 +43,7 @@ chrome.webRequest.onCompleted.addListener(function(request) {
 		if (songData.status !== "advertisement") {
 			if (debug) console.log("song");
 			httpPost("https://24.125.232.31/scripts/goplum.php", JSON.stringify(songData));
-			if (request.url.substr(30, 5) == "mplay") setTimeout(function() { chrome.tabs.executeScript({ code:'document.getElementById("player-bar-forward").click()' }) }, 7000);
+			if (request.url.substr(30, 5) == "mplay") setTimeout(function() { chrome.tabs.executeScript({ code:'document.getElementById("player-bar-forward").click()' }) }, 5000);
 		} else {
 			if (debug) console.log("advertisement");
 		}
