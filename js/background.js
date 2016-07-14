@@ -1,7 +1,9 @@
 // background.js
 
+var settings;
 var songData = { "info": {  } };
 var debug = true;
+chrome.storage.sync.get("settings", function(getData){console.log(getData); settings=getData.settings});
 
 function httpGet( url ) {
   var xmlHttp = new XMLHttpRequest();
@@ -19,6 +21,7 @@ function httpPost( url, data ) {
 }
 
 chrome.runtime.onMessage.addListener(function(message) {
+chrome.storage.sync.get("settings", function(getData){console.log(getData); settings=getData.settings});
   if (message.greeting == "goplum-info") {
 		if (debug) console.log("A message with the greeting of 'goplum-info' was recieved");
 	  parsed = JSON.parse(message.text);
@@ -41,11 +44,13 @@ chrome.webRequest.onCompleted.addListener(function(request) {
   setTimeout(function() {
 		if (debug) console.log("The timeout for httpPost() has ended");
 		if (songData.status !== "advertisement") {
-			if (debug) console.log("song");
-			httpPost("https://24.125.232.31/scripts/goplum.php", JSON.stringify(songData));
+			if (debug) console.log(songData);
+			console.log(settings.postsite);
+			httpPost(settings.postsite, JSON.stringify(songData));
+			
 			if (request.url.substr(30, 5) == "mplay") setTimeout(function() { chrome.tabs.executeScript({ code:'document.getElementById("player-bar-forward").click()' }) }, 5000);
 		} else {
 			if (debug) console.log("advertisement");
 		}
   }, 1000);
-}, {urls:["https://play.google.com/music/mplay?*&start=0","https://play.google.com/music/wplay?*&start=0"]})
+}, {urls:["https://play.google.com/music/mplay?*&start=0","https://play.google.com/music/wplay?*&start=0"]});
