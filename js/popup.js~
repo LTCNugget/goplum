@@ -6,9 +6,6 @@ function savesettings() {
 		}
 	});
 }
-function forcestop() {
-	chrome.extension.getBackgroundPage().forcestop = true;
-}
 chrome.storage.sync.getBytesInUse(null, function(bytes) { getBytesInUse = bytes; });
 window.onload = function() {
 	document.getElementById("savebox").addEventListener("click", savesettings);
@@ -25,5 +22,4 @@ window.onload = function() {
 			document.getElementById("postsite").value = getData.settings.postsite;
 		});
 	}
-	document.getElementById("stopall").addEventListener("click", forcestop);
 }
