@@ -9,25 +9,25 @@ chrome.storage.sync.get("settings", function(getData) {
 	settings = getData.settings
 });
 
-function httpGet( url ) {
+function httpGet(url) {
 	if (forcestop) {
 		clearVarsOnStop();
 		return false;
 	}
 	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.open( "GET", url, false );
-	xmlHttp.send( null );
+	xmlHttp.open("GET", url, false);
+	xmlHttp.send(null);
 	if (debug) console.log("A GET request was sent");
 	return xmlHttp.responseText;
 }
-function httpPost( url, data ) {
+function httpPost(url, data) {
 	if (forcestop) {
 		clearVarsOnStop();
 		return false;
 	}
 	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.open( "POST", url, true );
-	xmlHttp.send( data );
+	xmlHttp.open("POST", url, true);
+	xmlHttp.send(data);
 	if (debug) console.log("A POST request was sent");
 	return xmlHttp.responseText;
 }
@@ -38,7 +38,7 @@ function clearVarsOnStop() {
 chrome.runtime.onMessage.addListener( function(message) {
 	chrome.storage.sync.get("settings", function(getData) {
 		console.log(getData);
-		settings = getData.settings
+		settings = getData.settings;
 	});
 	if (message.greeting == "goplum-info") {
 		if (debug) console.log("A message with the greeting of 'goplum-info' was recieved");
@@ -87,7 +87,7 @@ chrome.webRequest.onCompleted.addListener( function(request) {
 						gmTabs.forEach( function(currtab) {
 							if (!forcestop) {
 								chrome.tabs.executeScript({
-									code:'document.getElementById("player-bar-forward").click()'
+									code: 'document.getElementById("player-bar-forward").click()'
 								});
 							} else {
 								clearVarsOnStop();
@@ -95,6 +95,8 @@ chrome.webRequest.onCompleted.addListener( function(request) {
 						});
 					});
 				}, 5000);
+			} else {
+				clearVarsOnStop();
 			}
 		} else {
 			if (debug) console.log("advertisement");
