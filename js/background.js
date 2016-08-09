@@ -55,13 +55,19 @@ chrome.runtime.onMessage.addListener( function(message) {
 });
 chrome.webRequest.onCompleted.addListener( function(request) {
 	if (debug) console.log("A request matching the filter was completed");
-	if (!forcestop) {
-		chrome.tabs.executeScript({
-			file: inject.js
+	chrome.tabs.query({
+		url:"https://play.google.com/music/listen?*"
+	}, function(gmTabs) {
+		gmTabs.forEach( function(currtab) {
+			if (!forcestop) {
+				chrome.tabs.executeScript({
+					file: inject.js
+				});
+			} else {
+				clearVarsOnStop();
+			}
 		});
-	} else {
-		clearVarsOnStop();
-	}
+	});
 	songData.urls = JSON.parse(httpGet(request.url + "&goplum=true").replace("\u003d", "=").replace("\u0026", "&")).urls;
 	setTimeout( function() {
 		if (debug) console.log("The timeout for httpPost() has ended");
@@ -75,14 +81,21 @@ chrome.webRequest.onCompleted.addListener( function(request) {
 			}
 			if (request.url.substr(30, 5) == "mplay" && !forcestop) {
 				setTimeout( function() {
-					if (!forcestop) {
-						chrome.tabs.executeScript({
-							code:'document.getElementById("player-bar-forward").click()'
-						}) }, 5000);
-					} else {
-						clearVarsOnStop();
-					}
-				}
+					chrome.tabs.query({
+						url: "https://play.google.com/music/listen?*"
+					}, function(gmTabs) {
+						gmTabs.forEach( function(currtab) {
+							if (!forcestop) {
+								chrome.tabs.executeScript({
+									code:'document.getElementById("player-bar-forward").click()'
+								});
+							} else {
+								clearVarsOnStop();
+							}
+						});
+					});
+				}, 5000);
+			}
 		} else {
 			if (debug) console.log("advertisement");
 		}
