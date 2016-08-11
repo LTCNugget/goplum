@@ -40,12 +40,27 @@ input[type=button]#savebox {
 }
 input[type=button]#stopall {
 	box-sizing:border-box;
-	margin:0 15%;
+	margin:0 55%;
 	display:inline-block;
-	bottom:5px;
+	bottom:10px;
 	position:absolute;
-	width: 70%;
+	width: 40%;
 	background-color: #ff3333;
+	color: white;
+	padding: 12px 20px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	left:0;
+}
+input[type=button]#restart {
+	box-sizing:border-box;
+	margin:0 5%;
+	display:inline-block;
+	bottom:10px;
+	position:absolute;
+	width: 40%;
+	background-color: #00cd66;
 	color: white;
 	padding: 12px 20px;
 	border: none;

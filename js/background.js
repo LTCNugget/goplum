@@ -1,19 +1,22 @@
 // background.js
 
-var settings;
-var songData = { "info": {  } };
-var debug = true;
-var forcestop = false;
+var settings,
+		songData = { "info": {  } },
+		debug = true,
+		forcestop = false;
 chrome.storage.sync.get("settings", function(getData) {
 	console.log(getData);
-	settings = getData.settings
+	settings = getData.settings;
 });
 
 function httpGet(url) {
+<<<<<<< HEAD
+=======
 	if (forcestop) {
 		clearVarsOnStop();
 		return false;
 	}
+>>>>>>> b1bf13cdf1336a1c98b150edc3ce44c7fa88c6f9
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.open("GET", url, false);
 	xmlHttp.send(null);
@@ -21,10 +24,13 @@ function httpGet(url) {
 	return xmlHttp.responseText;
 }
 function httpPost(url, data) {
+<<<<<<< HEAD
+=======
 	if (forcestop) {
 		clearVarsOnStop();
 		return false;
 	}
+>>>>>>> b1bf13cdf1336a1c98b150edc3ce44c7fa88c6f9
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.open("POST", url, true);
 	xmlHttp.send(data);
@@ -33,9 +39,10 @@ function httpPost(url, data) {
 }
 function clearVarsOnStop() {
 	songData = null;
+	if (debug) console.log("Variables cleared");
 }
 
-chrome.runtime.onMessage.addListener( function(message) {
+chrome.runtime.onMessage.addListener(function(message) {
 	chrome.storage.sync.get("settings", function(getData) {
 		console.log(getData);
 		settings = getData.settings;
@@ -53,7 +60,7 @@ chrome.runtime.onMessage.addListener( function(message) {
 		songData.status = "advertisement";
 	}
 });
-chrome.webRequest.onCompleted.addListener( function(request) {
+chrome.webRequest.onCompleted.addListener(function(request) {
 	if (debug) console.log("A request matching the filter was completed");
 	chrome.tabs.query({
 		url:"https://play.google.com/music/listen?*"
@@ -67,9 +74,16 @@ chrome.webRequest.onCompleted.addListener( function(request) {
 				clearVarsOnStop();
 			}
 		});
+<<<<<<< HEAD
+	} else {
+		clearVarsOnStop();
+		return false;
+	}
+=======
 	});
+>>>>>>> b1bf13cdf1336a1c98b150edc3ce44c7fa88c6f9
 	songData.urls = JSON.parse(httpGet(request.url + "&goplum=true").replace("\u003d", "=").replace("\u0026", "&")).urls;
-	setTimeout( function() {
+	setTimeout(function() {
 		if (debug) console.log("The timeout for httpPost() has ended");
 		if (songData.status !== "advertisement") {
 			if (debug) console.log(songData);
@@ -78,8 +92,24 @@ chrome.webRequest.onCompleted.addListener( function(request) {
 				httpPost(settings.postsite, JSON.stringify(songData));
 			} else {
 				clearVarsOnStop();
+				return false;
 			}
 			if (request.url.substr(30, 5) == "mplay" && !forcestop) {
+<<<<<<< HEAD
+				setTimeout(function() {
+					if (!forcestop) {
+						chrome.tabs.executeScript({
+							code: 'document.getElementById("player-bar-forward").click()'
+						});
+					} else {
+						clearVarsOnStop();
+						return false;
+					}
+				}, 5000);
+			} else {
+				if (debug) console.log("advertisement");
+			}
+=======
 				setTimeout( function() {
 					chrome.tabs.query({
 						url: "https://play.google.com/music/listen?*"
@@ -100,6 +130,7 @@ chrome.webRequest.onCompleted.addListener( function(request) {
 			}
 		} else {
 			if (debug) console.log("advertisement");
+>>>>>>> b1bf13cdf1336a1c98b150edc3ce44c7fa88c6f9
 		}
 	}, 1000);
 }, {
