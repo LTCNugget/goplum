@@ -69,9 +69,10 @@ chrome.runtime.onMessage.addListener(function(message) {
 		console.log(getData);
 		settings = getData.settings;
 	});
-	if (!forcestop) {
-		switch (message.greeting) {
-			case "goplum-info":
+	
+	switch (message.greeting) {
+		case "goplum-info":
+			if (!forcestop) {
 				if (debug) console.log("Message 'goplum-info' recieved");
 				parsed = JSON.parse(message.text);
 				songData.info.title = parsed.title;
@@ -79,7 +80,11 @@ chrome.runtime.onMessage.addListener(function(message) {
 				songData.info.artist = parsed.artist;
 				songData.info.art = parsed.art;
 				songData.status = "song";
-			break;
+			} else {
+				clearVarsOnStop();
+				return false;
+			}
+		break;
 			case "goplum-stop":
 				forcestop = true;
 				if (debug) console.log("Message 'goplum-stop' recieved");
@@ -94,10 +99,6 @@ chrome.runtime.onMessage.addListener(function(message) {
 				songData.status = "advertisement";
 			break;
 		}
-	} else {
-		clearVarsOnStop();
-		return false;
-	}
 });
 chrome.webRequest.onCompleted.addListener(function(request) {
 	if (debug) console.log("A request matching the filter was completed");
@@ -119,7 +120,7 @@ chrome.webRequest.onCompleted.addListener(function(request) {
 			console.log(settings.postsite);
 			if (!forcestop) {
 				httpPost(settings.postsite, JSON.stringify(songData));
-			} else {
+			} else {	
 				clearVarsOnStop();
 				return false;
 			}

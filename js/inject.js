@@ -6,6 +6,7 @@ if (document.getElementsByClassName("player-album")[0] !== undefined) {
 		artist: document.getElementsByClassName("player-artist")[0].innerText,
 		art: document.getElementById("playerBarArt").src
 	};
+	console.log(songInfo);
 	chrome.runtime.sendMessage({
 		greeting: "goplum-info",
 		text: JSON.stringify(songInfo)
