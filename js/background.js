@@ -1,7 +1,9 @@
 // background.js
 
 var settings,
-		songData = { "info": {  } },
+		songData = {
+			"info": {  }
+		},
 		debug = true,
 		forcestop = false;
 chrome.storage.sync.get("settings", function(getData) {
@@ -24,12 +26,14 @@ function httpPost(url, data) {
 	return xmlHttp.responseText;
 }
 function clearVarsOnStop() {
-	songData = { "info": {  } };
+	songData = {
+		"info": {  }
+	};
 	if (debug) console.log("Variables cleared");
 }
 function findMusic(onEachFunc) {
 	chrome.tabs.query({
-		url:"https://play.google.com/music/listen?*"
+		url: "https://play.google.com/music/listen?*"
 	}, function(gmTabs) {
 		gmTabs.forEach(function(currtab) {
 			onEachFunc(currtab);
