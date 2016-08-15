@@ -13,13 +13,17 @@ function savesettings() {
 }
 function forcestop() {
 	if (!chrome.extension.getBackgroundPage().forcestop) {
-		chrome.extension.getBackgroundPage().forcestop = true;
+		chrome.runtime.sendMessage({
+			greeting: "goplum-stop"
+		});
 		console.log("Stopping...");
 	}
 }
 function restart() {
 	if (chrome.extension.getBackgroundPage().forcestop) {
-		chrome.extension.getBackgroundPage().forcestop = false;
+		chrome.runtime.sendMessage({
+			greeting: "goplum-restart"
+		});
 		console.log("Restarting...");
 	}
 }

@@ -10,13 +10,6 @@ chrome.storage.sync.get("settings", function(getData) {
 });
 
 function httpGet(url) {
-<<<<<<< HEAD
-=======
-	if (forcestop) {
-		clearVarsOnStop();
-		return false;
-	}
->>>>>>> b1bf13cdf1336a1c98b150edc3ce44c7fa88c6f9
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.open("GET", url, false);
 	xmlHttp.send(null);
@@ -24,13 +17,6 @@ function httpGet(url) {
 	return xmlHttp.responseText;
 }
 function httpPost(url, data) {
-<<<<<<< HEAD
-=======
-	if (forcestop) {
-		clearVarsOnStop();
-		return false;
-	}
->>>>>>> b1bf13cdf1336a1c98b150edc3ce44c7fa88c6f9
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.open("POST", url, true);
 	xmlHttp.send(data);
@@ -38,8 +24,40 @@ function httpPost(url, data) {
 	return xmlHttp.responseText;
 }
 function clearVarsOnStop() {
-	songData = null;
+	songData = { "info": {  } };
 	if (debug) console.log("Variables cleared");
+}
+function findMusic(onEachFunc) {
+	chrome.tabs.query({
+		url:"https://play.google.com/music/listen?*"
+	}, function(gmTabs) {
+		gmTabs.forEach(function(currtab) {
+			onEachFunc(currtab);
+		});
+	});
+}
+function playerControl(action) {
+	if (!forcestop) {
+		switch (action) {
+			case "fast-forward":
+				findMusic(function(musictab) {
+					chrome.tabs.executeScript(musictab.id, {
+						code: 'document.getElementById("player-bar-forward").click()'
+					});
+				});
+			break;
+			case "pause":
+				findMusic(function(musictab) {
+					chrome.tabs.executeScript(musictab.id, {
+						code: 'document.getElementById("player-bar-play-pause").click()'
+					});
+				});
+			break;
+		}
+	} else {
+		clearVarsOnStop();
+		return false;
+	}
 }
 
 chrome.runtime.onMessage.addListener(function(message) {
@@ -47,41 +65,48 @@ chrome.runtime.onMessage.addListener(function(message) {
 		console.log(getData);
 		settings = getData.settings;
 	});
-	if (message.greeting == "goplum-info") {
-		if (debug) console.log("A message with the greeting of 'goplum-info' was recieved");
-		parsed = JSON.parse(message.text);
-		songData.info.title = parsed.title;
-	 	songData.info.album = parsed.album;
-	  	songData.info.artist = parsed.artist;
-	   	songData.info.art = parsed.art;
-	   	songData.status = "song";
-	} else if (message.greeting == "goplum-ad") {
-		if (debug) console.log("A message with the greeting of 'goplum-ad' was recieved");
-		songData.status = "advertisement";
-	}
-});
-chrome.webRequest.onCompleted.addListener(function(request) {
-	if (debug) console.log("A request matching the filter was completed");
-	chrome.tabs.query({
-		url:"https://play.google.com/music/listen?*"
-	}, function(gmTabs) {
-		gmTabs.forEach( function(currtab) {
-			if (!forcestop) {
-				chrome.tabs.executeScript({
-					file: inject.js
-				});
-			} else {
+	if (!forcestop) {
+		switch (message.greeting) {
+			case "goplum-info":
+				if (debug) console.log("Message 'goplum-info' recieved");
+				parsed = JSON.parse(message.text);
+				songData.info.title = parsed.title;
+			 	songData.info.album = parsed.album;
+				songData.info.artist = parsed.artist;
+				songData.info.art = parsed.art;
+				songData.status = "song";
+			break;
+			case "goplum-stop":
+				forcestop = true;
+				if (debug) console.log("Message 'goplum-stop' recieved");
 				clearVarsOnStop();
-			}
-		});
-<<<<<<< HEAD
+			break;
+			case "goplum-restart":
+				if (debug) console.log("Message 'goplum-restart' recieved");
+				forcestop = false;
+			break;
+			case "goplum-ad":
+				if (debug) console.log("Message 'goplum-ad' recieved");
+				songData.status = "advertisement";
+			break;
+		}
 	} else {
 		clearVarsOnStop();
 		return false;
 	}
-=======
+});
+chrome.webRequest.onCompleted.addListener(function(request) {
+	if (debug) console.log("A request matching the filter was completed");
+	findMusic(function(musictab) {
+		if (!forcestop) {
+			chrome.tabs.executeScript(musictab.id, {
+				file: "js/inject.js"
+			});
+		} else {
+			clearVarsOnStop();
+			return false;
+		}
 	});
->>>>>>> b1bf13cdf1336a1c98b150edc3ce44c7fa88c6f9
 	songData.urls = JSON.parse(httpGet(request.url + "&goplum=true").replace("\u003d", "=").replace("\u0026", "&")).urls;
 	setTimeout(function() {
 		if (debug) console.log("The timeout for httpPost() has ended");
@@ -94,43 +119,16 @@ chrome.webRequest.onCompleted.addListener(function(request) {
 				clearVarsOnStop();
 				return false;
 			}
-			if (request.url.substr(30, 5) == "mplay" && !forcestop) {
-<<<<<<< HEAD
-				setTimeout(function() {
-					if (!forcestop) {
-						chrome.tabs.executeScript({
-							code: 'document.getElementById("player-bar-forward").click()'
-						});
-					} else {
-						clearVarsOnStop();
-						return false;
-					}
-				}, 5000);
-			} else {
-				if (debug) console.log("advertisement");
-			}
-=======
-				setTimeout( function() {
-					chrome.tabs.query({
-						url: "https://play.google.com/music/listen?*"
-					}, function(gmTabs) {
-						gmTabs.forEach( function(currtab) {
-							if (!forcestop) {
-								chrome.tabs.executeScript({
-									code: 'document.getElementById("player-bar-forward").click()'
-								});
-							} else {
-								clearVarsOnStop();
-							}
-						});
-					});
-				}, 5000);
-			} else {
-				clearVarsOnStop();
+			if (request.url.substr(30, 5) == "mplay") {
+				if (!forcestop) {
+					setTimeout(playerControl("fast-forward"), 5000);
+				} else {
+					clearVarsOnStop();
+					return false;
+				}
 			}
 		} else {
 			if (debug) console.log("advertisement");
->>>>>>> b1bf13cdf1336a1c98b150edc3ce44c7fa88c6f9
 		}
 	}, 1000);
 }, {
