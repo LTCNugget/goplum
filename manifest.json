@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Goplum",
   "description": "Goplum takes music from Google Play Music and saves it.",
-  "version": "1.0",
+  "version": "1.9",
   "minimum_chrome_version": "10.0",
   "icons": {
     "16": "img/icon16.png",
@@ -22,7 +22,7 @@
     "scripts": ["js/background.js"]
   },
   "permissions": [
-    "tabs", "activeTab", "webRequest", "<all_urls>", "storage"
+    "tabs", "activeTab", "webRequest", "<all_urls>", "downloads", "storage"
   ],
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

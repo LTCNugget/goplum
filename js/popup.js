@@ -1,3 +1,5 @@
+// popup.js
+
 var settings, bytesInUse, remote;
 function savesettings() {
 	var isUrlMatch = document.getElementById("postsite").value.match("http(?:s?):\/\/(?:(?:[a-z]+\.)?[a-z]+\.[a-z]+|[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})(?:(?:\/(?:[a-z]|[0-9])+)?)+?\/(?:[a-z]|[0-9])+(\.php)");

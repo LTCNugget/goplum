@@ -1,36 +1,68 @@
-// background.js
+// js/background.js
 
 var settings,
 		songData = {
 			"info": {  }
 		},
-		debug = true,
 		forcestop = false;
+
 chrome.storage.sync.get("settings", function(getData) {
 	console.log(getData);
 	settings = getData.settings;
 });
 
+function playerControl(action) {
+	switch (action) {
+		case "next-song":
+			findMusic(function(musictab) {
+				chrome.tabs.executeScript(musictab.id, {
+					code: "document.getElementById('player-bar-forward').click()"
+				});
+			});
+		break;
+		case "last-song":
+			findMusic(function(musictab) {
+				chrome.tabs.executeScript(musictab.id, {
+					code: "document.getElementById('player-bar-play-rewind').click();"
+				});
+			});
+		break;
+		case "pause":
+			findMusic(function(musictab) {
+				chrome.tabs.executeScript(musictab.id, {
+					code: "if (document.getElementById('player-bar-play-pause').title=='Pause'){document.getElementById('player-bar-play-pause').click();}"
+				});
+			});
+		break;
+		case "play":
+			findMusic(function(musictab) {
+				chrome.tabs.executeScript(musictab.id, {
+					code: "if (document.getElementById('player-bar-play-pause').title=='Play'){document.getElementById('player-bar-play-pause').click();}"
+				});
+			});
+		break;
+	} // switch (action)
+} // function playerControl()
+
 function httpGet(url) {
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.open("GET", url, false);
 	xmlHttp.send(null);
-	if (debug) console.log("A GET request was sent");
 	return xmlHttp.responseText;
 }
+
 function httpPost(url, data) {
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.open("POST", url, true);
 	xmlHttp.send(data);
-	if (debug) console.log("A POST request was sent");
 	return xmlHttp.responseText;
 }
-function clearVarsOnStop() {
-	songData = {
-		"info": {  }
-	};
-	if (debug) console.log("Variables cleared");
+
+function forceStopping() {
+	forcestop = true;
+	playerControl("Pause");
 }
+
 function findMusic(onEachFunc) {
 	chrome.tabs.query({
 		url: "https://play.google.com/music/listen?*"
@@ -40,105 +72,55 @@ function findMusic(onEachFunc) {
 		});
 	});
 }
-function playerControl(action) {
-	if (!forcestop) {
-		switch (action) {
-			case "fast-forward":
-				findMusic(function(musictab) {
-					chrome.tabs.executeScript(musictab.id, {
-						code: 'document.getElementById("player-bar-forward").click()'
-					});
-				});
-			break;
-			case "pause":
-				findMusic(function(musictab) {
-					chrome.tabs.executeScript(musictab.id, {
-						code: 'document.getElementById("player-bar-play-pause").click()'
-					});
-				});
-			break;
-		}
-	} else {
-		clearVarsOnStop();
-		return false;
-	}
-}
 
 chrome.runtime.onMessage.addListener(function(message) {
-	chrome.storage.sync.get("settings", function(getData) {
-		console.log(getData);
-		settings = getData.settings;
-	});
-	
 	switch (message.greeting) {
-		case "goplum-info":
-			if (!forcestop) {
-				if (debug) console.log("Message 'goplum-info' recieved");
+		case "goplum-stop":
+			forceStopping();
+		break;
+		case "goplum-restart":
+			forcestop = false;
+		break;
+	} // switch (message.greeting)
+}); // onMessage.addListener()
+
+chrome.webRequest.onCompleted.addListener(function(request) {
+	if (!forcestop) {
+		chrome.runtime.onMessage.addListener(function goplumInfoResponse(message) {
+			chrome.runtime.onMessage.removeListener(goplumInfoResponse);
+			chrome.storage.sync.get("settings", function(getData) {
+				console.log(getData);
+				settings = getData.settings;
+			});
+			if (message.greeting === "goplum-info") {
 				parsed = JSON.parse(message.text);
 				songData.info.title = parsed.title;
 			 	songData.info.album = parsed.album;
 				songData.info.artist = parsed.artist;
-				songData.info.art = parsed.art;
-				songData.status = "song";
-			} else {
-				clearVarsOnStop();
-				return false;
+				songData.info.art = parsed.art.replace("s90-c-e", "s500-c-e");
 			}
-		break;
-			case "goplum-stop":
-				forcestop = true;
-				if (debug) console.log("Message 'goplum-stop' recieved");
-				clearVarsOnStop();
-			break;
-			case "goplum-restart":
-				if (debug) console.log("Message 'goplum-restart' recieved");
-				forcestop = false;
-			break;
-			case "goplum-ad":
-				if (debug) console.log("Message 'goplum-ad' recieved");
-				songData.status = "advertisement";
-			break;
-		}
-});
-chrome.webRequest.onCompleted.addListener(function(request) {
-	if (debug) console.log("A request matching the filter was completed");
-	findMusic(function(musictab) {
-		if (!forcestop) {
+		}); // onMessage.addListener()
+		findMusic(function(musictab) {
 			chrome.tabs.executeScript(musictab.id, {
 				file: "js/inject.js"
 			});
-		} else {
-			clearVarsOnStop();
-			return false;
-		}
-	});
-	songData.urls = JSON.parse(httpGet(request.url + "&goplum=true").replace("\u003d", "=").replace("\u0026", "&")).urls;
-	setTimeout(function() {
-		if (debug) console.log("The timeout for httpPost() has ended");
-		if (songData.status !== "advertisement") {
-			if (debug) console.log(songData);
+		}); // findMusic()
+		JSONStringMplay = httpGet(request.url + "&goplum=true").replace("\u003d", "=").replace("\u0026", "&");
+		songData.urls = JSON.parse(JSONStringMplay).urls;
+		setTimeout(function() {
 			console.log(settings.postsite);
+			httpPost(settings.postsite, JSON.stringify(songData));
 			if (!forcestop) {
-				httpPost(settings.postsite, JSON.stringify(songData));
-			} else {	
-				clearVarsOnStop();
-				return false;
+				setTimeout(function() {
+					playerControl("next-song");
+				}, 9000);
 			}
-			if (request.url.substr(30, 5) == "mplay") {
-				if (!forcestop) {
-					setTimeout(playerControl("fast-forward"), 5000);
-				} else {
-					clearVarsOnStop();
-					return false;
-				}
-			}
-		} else {
-			if (debug) console.log("advertisement");
-		}
-	}, 1000);
+		}, 1000);
+	} else {
+		forceStopping();
+	}
 }, {
 	urls: [
-		"https://play.google.com/music/mplay?*&start=0",
-		"https://play.google.com/music/wplay?*&start=0"
+		"https://play.google.com/music/mplay?*&start=0"
 	]
 });
